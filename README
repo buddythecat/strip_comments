@@ -1,0 +1,8 @@
+=================================================================
+Project 1 for CSC217 - 
+	State machine to remove C style comments from line input.
+Parses a line of input and outputs the line.  If the machine 
+encounters /* it starts to ignore the input until it reaches */.
+
+Written in C, compiled with gcc.
+

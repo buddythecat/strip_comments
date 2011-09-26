@@ -17,12 +17,17 @@
  */
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
+char output[1000];	/* the output for the program, as a string */
+int outPos;			/* the current position in output, 0-based */
 int current;		/* current keeps track of the current character being parsed. */
 int previous = 0; 	/* previous keeps track of the last character being parsed (if needed). */
 bool write = true; 	/* write flags weather or not the parser should write out the current characters */
 void checkChars(); 	/* function prototype for checkChars(), defined below */
 void writeChars(); 	/* function prototype for writeChars(), defined below */
+void addToString(char toAdd);
+void writeOutput();
 
 /*
  ============================================================================
@@ -39,6 +44,7 @@ int main(){
 	while( ( current = getchar() ) != EOF){
 		checkChars(&current, &previous);
 	}
+	writeOutput();
 	printf("\n");
 	/* return 0 on completion */
 	return 0;
@@ -88,11 +94,11 @@ void writeChars(){
 		/* the loop is currently not in a comment -- write out */
 		if(previous){
 			/* previous is not null, write out previous and clear previous */
-			putchar(previous);
+			addToString((char)previous);
 			previous = 0;
 		}
 		/* write out current */
-		putchar(current);
+		addToString((char)current);
 	}
 	else{
 		/*
@@ -101,4 +107,25 @@ void writeChars(){
 		 */
 		previous = 0;
 	}
+}
+
+void addToString(char toAdd){
+	if(outPos<1000){
+		output[outPos] = toAdd;
+		outPos++;
+	}
+	else{
+		writeOutput();
+		int i=0;
+		while(i<1000){
+			output[i] = 0;
+			i++;
+		}
+		outPos=0;
+		output[outPos]=toAdd;
+	}
+}
+
+void writeOutput(){
+	printf("%s",output);
 }

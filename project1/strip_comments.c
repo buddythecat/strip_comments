@@ -18,16 +18,18 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#define BUFFERSIZE 50			/* definition for  the size of the output buffer */
 
-char output[1000];	/* the output for the program, as a string */
-int outPos;			/* the current position in output, 0-based */
-int current;		/* current keeps track of the current character being parsed. */
-int previous = 0; 	/* previous keeps track of the last character being parsed (if needed). */
-bool write = true; 	/* write flags weather or not the parser should write out the current characters */
-void checkChars(); 	/* function prototype for checkChars(), defined below */
-void writeChars(); 	/* function prototype for writeChars(), defined below */
-void addToString(char toAdd);
-void writeOutput();
+
+char outputBuffer[BUFFERSIZE];	/* the output for the program, as a string */
+int bufferPos;					/* the current position in output, 0-based */
+int current;					/* current keeps track of the current character being parsed. */
+int previous = 0; 				/* previous keeps track of the last character being parsed (if needed). */
+bool write = true; 				/* write flags weather or not the parser should write out the current characters */
+void checkChars(); 				/* function prototype for checkChars(), defined below */
+void writeChars(); 				/* function prototype for writeChars(), defined below */
+void addToString(char toAdd);	/* function prototype for addToString(char toAdd), defined below */
+void writeOutput();				/* function prototype for writeOutput(), defined below.
 
 /*
  ============================================================================
@@ -83,10 +85,10 @@ void checkChars(){
 /*
  ============================================================================
  * writeChars()
- * Description	: this method is used to write characters out.  the method
- * 	first checks whether 'write' is true.  If it is, it will write out previous
- * 	(if previous isn't null), and it will write out current.
- * 	If 'write' is false, the method will clear previous for good measure and complete.
+ * Description	: this method is used to send characters to the output buffer.
+ *  the method first checks whether 'write' is true.  If it is, it will write out previous
+ * 	(if previous isn't null), and it will send the character to the string
+ * 	 buffer. If 'write' is false, the method will clear previous for good measure and complete.
  ============================================================================
  */
 void writeChars(){
@@ -108,24 +110,55 @@ void writeChars(){
 		previous = 0;
 	}
 }
-
+/*
+ ============================================================================
+ * addToString(char toAdd) -
+ * Description	: this method adds a character to the output buffer.  The
+ * 	output buffer is emptied every 50 characters by printing the contents out.
+ * 	when the buffer becomes full, printf() is called with the char array
+ * 	(note: this is not a null terminated terminated string, but just an array of
+ * 	characters.  This is because I'd rather the output not contain null characters,
+ * 	because the original input didn't contain these null chars.) passed to it.
+ * 	after the buffer is printed out, the bufferSize variable is reset to zero,
+ * 	and the char waiting to be added to the buffer is added to the front
+ * 	position. If the buffer isn't full, the char is added to the buffer at the rear.
+ * Parameters:
+ * 	[char] toAdd - the character being added to the buffer.
+ ============================================================================
+ */
 void addToString(char toAdd){
-	if(outPos<1000){
-		output[outPos] = toAdd;
-		outPos++;
+	//check to make sure the buffer has room for us to write to.
+	if(bufferPos<BUFFERSIZE){
+		//if it does, write toAdd to the next position in the buffer, and increment the buffer position
+		outputBuffer[bufferPos] = toAdd;
+		bufferPos++;
 	}
 	else{
+		//if there is no more space in the buffer, write the output to clear out the buffer.
 		writeOutput();
-		int i=0;
-		while(i<1000){
-			output[i] = 0;
-			i++;
+		//loop through the current buffer and clear it out (set each byte to null).
+		int i;
+		for(i=0;i<BUFFERSIZE; i++){
+			outputBuffer[i] = 0;
 		}
-		outPos=0;
-		output[outPos]=toAdd;
+		//reset the buffer position counter.
+		bufferPos=0;
+		//add the character to the first position in the buffer and...
+		outputBuffer[bufferPos]=toAdd;
+		//increment the buffer position
+		bufferPos++;
 	}
 }
-
+/**
+  ============================================================================
+ * writeOutput() -
+ * Description	: The writeOutput() function takes the program's buffer, and
+ * 	pipes it out, whether it's to the console, or to a file.  It achieves this
+ * 	by using the printf() function, formatted for a string, passing the
+ * 	outputBuffer character array.
+  ============================================================================
+ */
 void writeOutput(){
-	printf("%s",output);
+	//use printf() to output the contents of the outputBuffer as a string.
+	printf("%s",outputBuffer);
 }

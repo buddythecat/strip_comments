@@ -1,8 +1,21 @@
 =================================================================
 Project 1 for CSC217 - 
+=================================================================
+	Written by Rich Tufano
+	-------------------------------------------------------------
 	State machine to remove C style comments from line input.
-Parses a line of input and outputs the line.  If the machine 
-encounters /* it starts to ignore the input until it reaches */.
-
-Written in C, compiled with gcc.
-
+	Parses a line of input and outputs the line.  If the machine 
+	encounters /* it starts to ignore the input until it reaches */.
+	-------------------------------------------------------------
+	Written in C, compiled with gcc.
+	-------------------------------------------------------------
+	- Two plain-text files are included with in the /bin/ folder, 
+	input.txt and output.txt.  These are before and after
+	examples of what the parser does.  The input is a copy
+	of the strip_comments.c source (as it's an excellent demo
+	of how well it can strip comments).
+	- All source files are contained in the src directory.
+=================================================================
+	- The success of the program was testing using meld, a 
+	differential program for GNOME.  
+=================================================================

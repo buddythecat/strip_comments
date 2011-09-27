@@ -2,6 +2,7 @@
  ============================================================================
  Name        : strip_comments.c
  Author      : Rich Tufano
+ Headers	 : STDIO, STDBOOL, STRING
  Description : This program is designed to parse input and remove any C style
 				 comments from the input itself.  It does this by reading the
 				 input character by character.  When it encounters a / or *

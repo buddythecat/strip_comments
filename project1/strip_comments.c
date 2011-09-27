@@ -25,7 +25,8 @@ char outputBuffer[BUFFERSIZE];	/* the output for the program, as a string */
 int bufferPos;					/* the current position in output, 0-based */
 int current;					/* current keeps track of the current character being parsed. */
 int previous = 0; 				/* previous keeps track of the last character being parsed (if needed). */
-bool write = true; 				/* write flags weather or not the parser should write out the current characters */
+bool write = true; 				/* write flags whether or not the parser should write out the current characters */
+bool inLineComment = false;		/* write flags for whether or not the parser is in a line-style C++ comment */
 void checkChars(); 				/* function prototype for checkChars(), defined below */
 void writeChars(); 				/* function prototype for writeChars(), defined below */
 void addToString(char toAdd);	/* function prototype for addToString(char toAdd), defined below */
@@ -60,25 +61,43 @@ int main(){
  * 	detects the start or the end of a comment, it will flag the boolean 'write'
  * 	false or true respectively.  If no comment start- or end-block is found,
  * 	the function will call the writeChars() method.
+ * 	- EXTRA CREDIT: I've added catching for the single-line, C++ style comments
  ============================================================================
  */
 void checkChars(){
+	/*	this is the case for the beginning of a block comment */
 	if (previous == '/' && current == '*'){
 		/* Entered into a comment, flag write as false. Clear previous */
 		write = false;
 		previous = 0;
 	}
+	/*	this is the case for the end of a block comment */
 	else if (previous == '*' && current == '/'){
 		/*Exiting a comment, flag write as true. Clear previous */
 		write = true;
 		previous = 0;
 	}
+	/*	this is the special case for the C++ line comment */
+	else if (previous == '/' && current == '/'){
+		/* 	activate the inlineComment flag, to disable writing */
+		inLineComment = true;
+	}
+	/*	this is a watch condition.  the next character may be the beginning of a case. */
 	else if ( (current == '*' || current == '/') && previous == 0){
 		/* This is a watched character.  Set it to previous and check the next character(as long as previous is null) */
 		previous = current;
 	}
+	/* 	None of the watched characters were found.  Call the write function */
 	else{
-		/* None of the watched characters were found.  Call the write function */
+		/*
+		 * This if statement is to unflag the inLineComment if we've reached the end of a commented line.
+		 * 0x0A is the Hexadecimal ASCII code for the newline code (the end of the line).  Therefore,
+		 * if the parser encounters this the inLineComment flag should be set to false despite it's
+		 * initial state.
+		 */
+		if(current == 0x0A)
+			inLineComment = false;
+		// send the character to be written
 		writeChars();
 	}
 }
@@ -86,13 +105,16 @@ void checkChars(){
  ============================================================================
  * writeChars()
  * Description	: this method is used to send characters to the output buffer.
- *  the method first checks whether 'write' is true.  If it is, it will write out previous
- * 	(if previous isn't null), and it will send the character to the string
- * 	 buffer. If 'write' is false, the method will clear previous for good measure and complete.
+ *  The condition required to write out is that the 'write' flag must be true,
+ *  and the 'inLineComment' flag must be false.  (Don't write if we're in a block
+ *  comment or a line comment). If the condition is met, it will send previous
+ * 	(if previous isn't null), and it will the current character to the string
+ * 	buffer. If 'write' is false or 'inLineComment' is true, the method
+ * 	will clear previous for good measure and complete.
  ============================================================================
  */
 void writeChars(){
-	if(write){
+	if(write && !inLineComment){
 		/* the loop is currently not in a comment -- write out */
 		if(previous){
 			/* previous is not null, write out previous and clear previous */

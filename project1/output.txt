@@ -1,0 +1,108 @@
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+#define BUFFERSIZE 50			
+
+
+char outputBuffer[BUFFERSIZE];	
+int bufferPos;					
+int current;					
+int previous = 0; 				
+bool write = true; 				
+bool inLineComment = false;		
+void checkChars(); 				
+void writeChars(); 				
+void addToString(char toAdd);	
+void writeOutput();				
+int main(){
+	
+	while( ( current = getchar() ) != EOF){
+		checkChars(&current, &previous);
+	}
+	writeOutput();
+	printf("\n");
+	
+	return 0;
+}
+
+
+void checkChars(){
+	
+	if (previous == '/' && current == '*'){
+		
+		write = false;
+		previous = 0;
+	}
+	
+	else if (previous == '*' && current == '/'){
+		
+		write = true;
+		previous = 0;
+	}
+	
+	else if (previous == '/' && current == '/'){
+		
+		inLineComment = true;
+	}
+	
+	else if ( (current == '*' || current == '/') && previous == 0){
+		
+		previous = current;
+	}
+	
+	else{
+		
+		if(current == 0x0A)
+			inLineComment = false;
+		
+		writeChars();
+	}
+}
+
+void writeChars(){
+	if(write && !inLineComment){
+		
+		if(previous){
+			
+			addToString((char)previous);
+			previous = 0;
+		}
+		
+		addToString((char)current);
+	}
+	else{
+		
+		previous = 0;
+	}
+}
+
+void addToString(char toAdd){
+	
+	if(bufferPos<BUFFERSIZE){
+		
+		outputBuffer[bufferPos] = toAdd;
+		bufferPos++;
+	}
+	else{
+		
+		writeOutput();
+		
+		int i;
+		for(i=0;i<BUFFERSIZE; i++){
+			outputBuffer[i] = 0;
+		}
+		
+		bufferPos=0;
+		
+		outputBuffer[bufferPos]=toAdd;
+		
+		bufferPos++;
+	}
+}
+
+void writeOutput(){
+	
+	printf("%s",outputBuffer);
+}
+

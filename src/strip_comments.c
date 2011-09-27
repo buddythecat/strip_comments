@@ -14,6 +14,9 @@
 				 whether to write out or not is handled by the boolean write.
 				 The current character and previous character are held by the
 				 variables 'current' and 'previous' respectively.
+URL			: This source code is can be found on git
+				https://github.com/buddythecat/strip_comments
+Copyright 	: 2011, Rich "Dances With Caterpillars" Tufano (not that anyone cares)
  ============================================================================
  */
 #include <stdio.h>

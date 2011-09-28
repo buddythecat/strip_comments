@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : strip_comments.c
- Author      : Rich Tufano
+ Author      : Rich "Dances With Caterpillars" Tufano
  Headers	 : STDIO, STDBOOL, STRING
  Description : This program is designed to parse input and remove any C style
 				 comments from the input itself.  It does this by reading the
@@ -32,9 +32,9 @@ int previous = 0; 				/* previous keeps track of the last character being parsed
 bool write = true; 				/* write flags whether or not the parser should write out the current characters */
 bool inLineComment = false;		/* write flags for whether or not the parser is in a line-style C++ comment */
 void checkChars(); 				/* function prototype for checkChars(), defined below */
-void writeChars(); 				/* function prototype for writeChars(), defined below */
-void addToString(char toAdd);	/* function prototype for addToString(char toAdd), defined below */
-void writeOutput();				/* function prototype for writeOutput(), defined below.
+void processChar(); 				/* function prototype for processChar(), defined below */
+void toOutputBuffer(char toAdd);/* function prototype for toOutputBuffer(char toAdd), defined below */
+void writeBufferOut();				/* function prototype for writeBufferOut(), defined below.
 
 /*
  ============================================================================
@@ -51,7 +51,7 @@ int main(){
 	while( ( current = getchar() ) != EOF){
 		checkChars(&current, &previous);
 	}
-	writeOutput();
+	writeBufferOut();
 	printf("\n");
 	/* return 0 on completion */
 	return 0;
@@ -64,7 +64,7 @@ int main(){
  * 	and	to decide whether or not the parser is within a comment. If the function
  * 	detects the start or the end of a comment, it will flag the boolean 'write'
  * 	false or true respectively.  If no comment start- or end-block is found,
- * 	the function will call the writeChars() method.
+ * 	the function will call the processChar() method.
  * 	- EXTRA CREDIT: I've added catching for the single-line, C++ style comments
  ============================================================================
  */
@@ -102,12 +102,12 @@ void checkChars(){
 		if(current == 0x0A)
 			inLineComment = false;
 		// send the character to be written
-		writeChars();
+		processChar();
 	}
 }
 /*
  ============================================================================
- * writeChars()
+ * processChar()
  * Description	: this method is used to send characters to the output buffer.
  *  The condition required to write out is that the 'write' flag must be true,
  *  and the 'inLineComment' flag must be false.  (Don't write if we're in a block
@@ -117,16 +117,16 @@ void checkChars(){
  * 	will clear previous for good measure and complete.
  ============================================================================
  */
-void writeChars(){
+void processChar(){
 	if(write && !inLineComment){
 		/* the loop is currently not in a comment -- write out */
 		if(previous){
 			/* previous is not null, write out previous and clear previous */
-			addToString((char)previous);
+			toOutputBuffer((char)previous);
 			previous = 0;
 		}
 		/* write out current */
-		addToString((char)current);
+		toOutputBuffer((char)current);
 	}
 	else{
 		/*
@@ -138,7 +138,7 @@ void writeChars(){
 }
 /*
  ============================================================================
- * addToString(char toAdd) -
+ * toOutputBuffer(char toAdd) -
  * Description	: this method adds a character to the output buffer.  The
  * 	output buffer is emptied every 50 characters by printing the contents out.
  * 	when the buffer becomes full, printf() is called with the char array
@@ -152,7 +152,7 @@ void writeChars(){
  * 	[char] toAdd - the character being added to the buffer.
  ============================================================================
  */
-void addToString(char toAdd){
+void toOutputBuffer(char toAdd){
 	//check to make sure the buffer has room for us to write to.
 	if(bufferPos<BUFFERSIZE){
 		//if it does, write toAdd to the next position in the buffer, and increment the buffer position
@@ -161,7 +161,7 @@ void addToString(char toAdd){
 	}
 	else{
 		//if there is no more space in the buffer, write the output to clear out the buffer.
-		writeOutput();
+		writeBufferOut();
 		//loop through the current buffer and clear it out (set each byte to null).
 		int i;
 		for(i=0;i<BUFFERSIZE; i++){
@@ -177,14 +177,14 @@ void addToString(char toAdd){
 }
 /**
   ============================================================================
- * writeOutput() -
- * Description	: The writeOutput() function takes the program's buffer, and
+ * writeBufferOut() -
+ * Description	: The writeBufferOut() function takes the program's buffer, and
  * 	pipes it out, whether it's to the console, or to a file.  It achieves this
  * 	by using the printf() function, formatted for a string, passing the
  * 	outputBuffer character array.
   ============================================================================
  */
-void writeOutput(){
+void writeBufferOut(){
 	//use printf() to output the contents of the outputBuffer as a string.
 	printf("%s",outputBuffer);
 }

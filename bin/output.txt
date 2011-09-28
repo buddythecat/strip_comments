@@ -12,15 +12,15 @@ int previous = 0;
 bool write = true; 				
 bool inLineComment = false;		
 void checkChars(); 				
-void writeChars(); 				
-void addToString(char toAdd);	
-void writeOutput();				
+void processChar(); 				
+void toOutputBuffer(char toAdd);
+void writeBufferOut();				
 int main(){
 	
 	while( ( current = getchar() ) != EOF){
 		checkChars(&current, &previous);
 	}
-	writeOutput();
+	writeBufferOut();
 	printf("\n");
 	
 	return 0;
@@ -56,20 +56,20 @@ void checkChars(){
 		if(current == 0x0A)
 			inLineComment = false;
 		
-		writeChars();
+		processChar();
 	}
 }
 
-void writeChars(){
+void processChar(){
 	if(write && !inLineComment){
 		
 		if(previous){
 			
-			addToString((char)previous);
+			toOutputBuffer((char)previous);
 			previous = 0;
 		}
 		
-		addToString((char)current);
+		toOutputBuffer((char)current);
 	}
 	else{
 		
@@ -77,7 +77,7 @@ void writeChars(){
 	}
 }
 
-void addToString(char toAdd){
+void toOutputBuffer(char toAdd){
 	
 	if(bufferPos<BUFFERSIZE){
 		
@@ -86,7 +86,7 @@ void addToString(char toAdd){
 	}
 	else{
 		
-		writeOutput();
+		writeBufferOut();
 		
 		int i;
 		for(i=0;i<BUFFERSIZE; i++){
@@ -101,7 +101,7 @@ void addToString(char toAdd){
 	}
 }
 
-void writeOutput(){
+void writeBufferOut(){
 	
 	printf("%s",outputBuffer);
 }

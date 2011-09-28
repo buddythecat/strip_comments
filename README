@@ -1,21 +1,119 @@
-=================================================================
-Project 1 for CSC217 - 
-=================================================================
-	Written by Rich Tufano
-	-------------------------------------------------------------
-	State machine to remove C style comments from line input.
-	Parses a line of input and outputs the line.  If the machine 
-	encounters /* it starts to ignore the input until it reaches */.
-	-------------------------------------------------------------
-	Written in C, compiled with gcc.
-	-------------------------------------------------------------
-	- Two plain-text files are included with in the /bin/ folder, 
-	input.txt and output.txt.  These are before and after
-	examples of what the parser does.  The input is a copy
-	of the strip_comments.c source (as it's an excellent demo
-	of how well it can strip comments).
-	- All source files are contained in the src directory.
-=================================================================
-	- The success of the program was testing using meld, a 
-	differential program for GNOME.  
-=================================================================
+=================================================================================
+STRIP_COMMENTS.C
+	----------------------------------------------------
+	written by Rich "Dances with Caterpillars" Tufano
+	----------------------------------------------------
+=================================================================================
+::Analysis::
+	Writing this program, although not the most complex thing in the world,
+was rather difficult.  I never realized exaclty how relient I am on Java
+and the idea of Object Orientation.  
+
+:::::DESIGN:::::
+		When I first sat down to design the procedure, I viewed it very simply.
+	I mapped out the series of logical statements that would drive the machine,
+	and how they would all interact.  As time went on, I flushed it out, and 
+	tried to break the logic apart into modules.  
+		I ended up deciding on using a buffer (although very simple) 
+	to store the characters waiting to be written out.  Once the buffer is 
+	full, it's dumped out (to console or piped to a file), the buffer is cleared, 
+	and the index is set back to zero.  One thing I thought would be cool, would
+	be to design the buffer as a circular queue, but thought that it would be best
+	to keep it simple first.
+		For the logic, the system has about six cases when parsing a character
+	from the input.  
+	
+		:Watch Cases::the watch cases occur when the parser encounters a watched
+			character that does NOT follow a previous watch character.  The char
+			being parsed gets stored in a spot reserved for the previous character
+			and the parser steps to the next char.
+			
+		:Flag Cases::the flag cases occur when the parser encounters a watched
+			character that HAS followed a previous watch character.  The parser
+			then switches depending on what the last character was.  The three
+			cases are:
+				1)	'/*' with current = '*' and previous '/' -> this is the start
+					of a comment block.  The write flag is set to false, and the
+					parser continues to the next character.  If the write flag
+					is already set to false, it should remain this way.
+				2)	'*/' with current = '/' and previous '*' -> this is the end
+					of a comment block.  The write flag is set to true, and the 
+					parser continues to the next character.  If the write flag
+					is already set to true, (as in, the end-comment occurs outside
+					of a comment), the write flag should stay true.  
+				3) '//' with current = '/' and previous = '/' -> this is the start
+					of a line-comment.  the lineComment flag is set to true, and
+					the parser continues to the next character.
+					
+		:Special Cases::the one special case exists is when the parser encounters
+			an end-of-line character-code.  When this happens, the 'inLineComment'
+			flag should be set to false, being that any inLineComment has now ended.
+			
+		:Default Case::the default case is that no watch character was parsed 
+			during the current run.  However, the previously parsed character may
+			have been a watch character, and therefor may not have been written
+			to the buffer (if the machine wasn't in a comment), therefore processChar()
+			must make sure to check the previous character when writing anything to
+			the buffer.
+			
+		These cases are what control the logic of the program, and how it decides whether
+	or not to write a character out.
+		If none of the cases are hit, the default case is to write out to the 
+	output buffer.  when they're sent to the processChar() method, this method 
+	does a simple logic check to make sure that the write flag is true, and
+	the inlineComment flag is false, then adds them to the buffer by sending
+	them to the toOutputBuffer() function.
+		The toOutputBuffer function then checks the buffer to make sure it's not full
+	and adds the characters.  If it is full, it dumps the buffer out by calling
+	writeBufferOut(), and resets the buffer.
+		writeBufferOut() handles printing the buffer out to the console or redirection.
+		
+	The machine terminates once the character being parsed is the EndOfFile character,
+	and before termination dumps the rest of the buffer out to the console, and prints
+	the newline character out as well, in order to preserve the console.
+	
+::::TESTING::::
+	To test the program, and whether or not it did it's job, and didn't just
+remove text willy-nilly, I had to choose a test input file.  It had to be
+something with lots of diffent kinds of comments, in all different places...
+I know! The source code for the program!
+
+	So, I ended up running all of the tests using strip_comments.c.  The
+program's source code contains a bunch of great different situations where
+it may be tricky to parse comments.  It has large block comments containing
+other watched characters, and assorted odd characters.  It also contains 
+block-style comments in between C statements, as well as block-style comments
+at the end of lines of code.  The source also has C++ style comments scattered
+about in different positions.  The wide variety of comment positions made the
+soruce file a rather robust test of the program itself.  Using
+console redirection, I then piped all of this to an output file called
+output.txt
+
+	$./strip_comments.bin < strip_comments.c > output.txt
+	
+	In order to test to make sure that only the comments were being removed,
+and that the actual content was kept intact, i used a differntial program.  
+In my case, I used Meld (http://meld.sourceforge.net/), which is a lovely
+merge and diff tool for GNOME, to compare the two files.  Meld 
+does a fantastic job of highlighting the changes, showing where the changes
+occured, and what type of code the changes were.  Low and behold,
+it *seemed* to remove only the comments.
+
+While compiling, I used gcc 4.5.2:
+	$gcc strip_comments.c -o strip_comments.bin
+
+::::Problems::::
+	The biggest problem I had with the program was with the buffer! I had
+a bunch of different logical errors where I started to overwrite the buffer
+without dumping it out, or indexing it wrong, or forgetting to put the previous
+character into the buffer.
+	I also had quite a few problems comming up with a half-decent design.
+	
+::::Improvements:::
+	The one improvement I'd like to make is so that the data all doesn't float
+outside of the methods, and make it more encapsulated, like Object Oriented 
+style languages... You have NO IDEA how badly I wanted to make all of the methods
+and variables public/private/protected... :(
+=================================================================================
+This code available on git :: https://github.com/buddythecat/strip_comments
+=================================================================================

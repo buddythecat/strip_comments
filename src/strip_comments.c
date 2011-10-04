@@ -1,9 +1,12 @@
 /*
  ============================================================================
- Name        : strip_comments.c
- Author      : Rich "Dances With Caterpillars" Tufano
- Headers	 : STDIO, STDBOOL, STRING
- Description : This program is designed to parse input and remove any C style
+ File		: strip_comments.c
+ Author		: Rich "Dances With Caterpillars" Tufano <buddythecat@gmail.com>
+ Class		: CSC217 - section RA
+ Assignment	: Project 1 - strip-comments
+ Due		: Oct 4th, 2011 - 11:59pm
+ Uses		: STDIO, STDBOOL, STRING
+ Description 	: This program is designed to parse input and remove any C style
 				 comments from the input itself.  It does this by reading the
 				 input character by character.  When it encounters a / or *
 				 character, it sets the previous character to to the current.

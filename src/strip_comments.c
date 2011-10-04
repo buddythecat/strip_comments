@@ -17,36 +17,35 @@
 				 whether to write out or not is handled by the boolean write.
 				 The current character and previous character are held by the
 				 variables 'current' and 'previous' respectively.
-URL			: This source code is can be found on git
-				https://github.com/buddythecat/strip_comments
+URL		: This source code is can be found on github
+			https://github.com/buddythecat/strip_comments
 Copyright 	: 2011, Rich "Dances With Caterpillars" Tufano (not that anyone cares)
  ============================================================================
  */
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#define BUFFERSIZE 50			/* definition for  the size of the output buffer */
+#define BUFFERSIZE 50				/* definition for  the size of the output buffer */
 
 
-char outputBuffer[BUFFERSIZE];	/* the output for the program, as a string */
+char outputBuffer[BUFFERSIZE];			/* the output for the program, as a string */
 int bufferPos;					/* the current position in output, 0-based */
 int current;					/* current keeps track of the current character being parsed. */
 int previous = 0; 				/* previous keeps track of the last character being parsed (if needed). */
 bool write = true; 				/* write flags whether or not the parser should write out the current characters */
-bool inLineComment = false;		/* write flags for whether or not the parser is in a line-style C++ comment */
+bool inLineComment = false;			/* write flags for whether or not the parser is in a line-style C++ comment */
 void checkChars(); 				/* function prototype for checkChars(), defined below */
 void processChar(); 				/* function prototype for processChar(), defined below */
-void toOutputBuffer(char toAdd);/* function prototype for toOutputBuffer(char toAdd), defined below */
+void toOutputBuffer(char toAdd);		/* function prototype for toOutputBuffer(char toAdd), defined below */
 void writeBufferOut();				/* function prototype for writeBufferOut(), defined below.
 
 /*
  ============================================================================
- * main()
- * 	Description	: the main function is the applications main loop.  This is what parses
- * 		the input.  The loop continues until the EOF (End of File) is read,
- * 		and each time a character is read, this function calls the checkChars()
- * 		function.
- * 	Returns		: 0 upon clean completion
+ * main() -
+ * Description	: the main function is the applications main loop.  This is what parses
+ * 	the input.  The loop continues until the EOF (End of File) is read,
+ * 	and each time a character is read, this function calls the checkChars() function.
+ * Returns	: 0 upon clean completion
  ============================================================================
  */
 int main(){
@@ -62,13 +61,13 @@ int main(){
 
 /*
  ============================================================================
- * checkChars()
+ * checkChars() - 
  * Description	: this method is designed to process the characters being read,
- * 	and	to decide whether or not the parser is within a comment. If the function
+ * 	and to decide whether or not the parser is within a comment. If the function
  * 	detects the start or the end of a comment, it will flag the boolean 'write'
  * 	false or true respectively.  If no comment start- or end-block is found,
  * 	the function will call the processChar() method.
- * 	- EXTRA CREDIT: I've added catching for the single-line, C++ style comments
+ * -- EXTRA CREDIT: I've added catching for the single-line, C++ style comments
  ============================================================================
  */
 void checkChars(){
@@ -110,11 +109,11 @@ void checkChars(){
 }
 /*
  ============================================================================
- * processChar()
+ * processChar() - 
  * Description	: this method is used to send characters to the output buffer.
- *  The condition required to write out is that the 'write' flag must be true,
- *  and the 'inLineComment' flag must be false.  (Don't write if we're in a block
- *  comment or a line comment). If the condition is met, it will send previous
+ *  	The condition required to write out is that the 'write' flag must be true,
+ *  	and the 'inLineComment' flag must be false.  (Don't write if we're in a block
+ *  	comment or a line comment). If the condition is met, it will send previous
  * 	(if previous isn't null), and it will the current character to the string
  * 	buffer. If 'write' is false or 'inLineComment' is true, the method
  * 	will clear previous for good measure and complete.
@@ -151,7 +150,7 @@ void processChar(){
  * 	after the buffer is printed out, the bufferSize variable is reset to zero,
  * 	and the char waiting to be added to the buffer is added to the front
  * 	position. If the buffer isn't full, the char is added to the buffer at the rear.
- * Parameters:
+ * Parameters	:
  * 	[char] toAdd - the character being added to the buffer.
  ============================================================================
  */
